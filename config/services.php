@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'horizon' => [
+        'allowed_email' => env('HORIZON_ALLOWED_EMAIL'),
+    ],
+
 ];

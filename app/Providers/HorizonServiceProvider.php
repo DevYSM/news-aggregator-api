@@ -33,7 +33,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
             }
 
             return in_array(optional($user)->email, [
-                env('HORIZON_ALLOWED_EMAIL'),
+                config('services.horizon.allowed_email'),
             ]);
         });
     }
