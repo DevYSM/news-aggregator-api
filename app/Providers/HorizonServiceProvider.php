@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
-use Laravel\Horizon\Horizon;
 use Laravel\Horizon\HorizonApplicationServiceProvider;
 
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
@@ -32,9 +31,8 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
                 return true;
             }
 
-            return in_array(optional($user)->email, [
-                config('services.horizon.allowed_email'),
-            ]);
+            $allowedEmails = explode(',', config('services.horizon.allowed_email'));
+            return in_array(optional($user)->email, $allowedEmails);
         });
     }
 }
