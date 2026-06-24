@@ -18,20 +18,12 @@ class PersonalizedFeedService
     {
         $preference = $user->preference;
 
-        if (! $preference) {
-            return Article::query()
-                ->orderBy('published_at', 'desc')
-                ->paginate($perPage);
-        }
-
-        $hasSources = filled($preference->sources);
-        $hasCategories = filled($preference->categories);
-        $hasAuthors = filled($preference->authors);
+        $hasSources = filled($preference?->sources);
+        $hasCategories = filled($preference?->categories);
+        $hasAuthors = filled($preference?->authors);
 
         if (! $hasSources && ! $hasCategories && ! $hasAuthors) {
-            return Article::query()
-                ->orderBy('published_at', 'desc')
-                ->paginate($perPage);
+            return $this->defaultFeed($perPage);
         }
 
         return Article::query()
@@ -48,6 +40,13 @@ class PersonalizedFeedService
                     $query->orWhereIn('author', $preference->authors);
                 }
             })
+            ->orderBy('published_at', 'desc')
+            ->paginate($perPage);
+    }
+
+    private function defaultFeed(int $perPage): LengthAwarePaginator
+    {
+        return Article::query()
             ->orderBy('published_at', 'desc')
             ->paginate($perPage);
     }
