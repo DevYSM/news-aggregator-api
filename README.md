@@ -68,6 +68,7 @@ Horizon dashboard at `http://localhost:${APP_PORT}/horizon`.
 | `mysql` | `mysql:8` | Primary database |
 | `redis` | `redis:7-alpine` | Queue, cache, sessions |
 | `horizon` | Same as `app` | Queue worker + monitoring |
+| `scheduler` | Same as `app` | Laravel task scheduler (via supervisord) |
 
 ---
 
@@ -161,7 +162,8 @@ config/
 
 docker/
 ├── nginx/default.conf
-└── php/local.ini
+├── php/local.ini
+└── supervisor/supervisord.conf
 
 Dockerfile
 docker-compose.yml
@@ -253,6 +255,26 @@ docker compose exec app php artisan horizon:continue
 **Production access** — set `HORIZON_ALLOWED_EMAIL` in `.env` (comma-separated for multiple emails). Unauthenticated access is blocked in non-local environments.
 
 The scheduler runs `horizon:snapshot` every 5 minutes to power the metrics graphs in the dashboard.
+
+---
+
+## Scheduler
+
+The `scheduler` service runs `php artisan schedule:work` under supervisord, which keeps the process alive and restarts it automatically on failure.
+
+Logs are written inside the container at:
+
+```
+/var/log/supervisor/scheduler.out.log
+/var/log/supervisor/scheduler.err.log
+```
+
+```bash
+# Tail scheduler logs
+docker compose logs -f scheduler
+```
+
+The scheduler fires `news:fetch --queue` hourly and `horizon:snapshot` every 5 minutes.
 
 ---
 
