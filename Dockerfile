@@ -7,6 +7,7 @@ RUN apk add --no-cache \
     curl \
     git \
     unzip \
+    supervisor \
     libpng-dev \
     libjpeg-turbo-dev \
     libzip-dev \
