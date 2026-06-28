@@ -46,6 +46,26 @@ services:
         volumes:
             - redis_data:/data
 
+    scheduler:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: >
+            sh -c "mkdir -p /var/log/supervisor &&
+                   supervisord -c /etc/supervisor/conf.d/supervisord.conf"
+        volumes:
+            - .:/var/www/html
+            - /var/www/html/vendor
+            - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+            - ./docker/supervisor/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_started
+        env_file: .env
+        restart: unless-stopped
+
     horizon:
         build:
             context: .
